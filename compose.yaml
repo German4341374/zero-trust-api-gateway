@@ -1,0 +1,125 @@
+name: zero-trust-api-gateway
+
+services:
+  identity-db:
+    image: postgres:18.4-alpine3.23
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: local-demo-keycloak
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U keycloak -d keycloak']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - identity-data:/var/lib/postgresql/data
+    networks: [backend]
+    restart: unless-stopped
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.0
+    command: ['start-dev', '--import-realm']
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://identity-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: local-demo-keycloak
+      KC_HOSTNAME: http://localhost:8180
+      KC_HTTP_ENABLED: 'true'
+      KC_HEALTH_ENABLED: 'true'
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: local-demo-admin
+    depends_on:
+      identity-db:
+        condition: service_healthy
+    volumes:
+      - ./keycloak/portfolio-realm.json:/opt/keycloak/data/import/portfolio-realm.json:ro
+    ports:
+      - '127.0.0.1:8180:8080'
+    networks: [edge, backend]
+    restart: unless-stopped
+
+  opa:
+    image: openpolicyagent/opa:1.17.0
+    command: ['run', '--server', '--addr=0.0.0.0:8181', '/policies']
+    volumes:
+      - ./policies:/policies:ro
+    networks: [backend]
+    read_only: true
+    security_opt: ['no-new-privileges:true']
+    restart: unless-stopped
+
+  redis:
+    image: redis:8.8.1-alpine3.23
+    command: ['redis-server', '--save', '', '--appendonly', 'no']
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [backend]
+    read_only: true
+    tmpfs: [/data]
+    security_opt: ['no-new-privileges:true']
+    restart: unless-stopped
+
+  upstream:
+    build:
+      context: .
+      target: runtime
+    environment:
+      ROLE: upstream
+      PORT: 8090
+      LOG_LEVEL: info
+    networks: [backend]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    init: true
+    restart: unless-stopped
+
+  gateway:
+    build:
+      context: .
+      target: runtime
+    environment:
+      ROLE: gateway
+      PORT: 8080
+      LOG_LEVEL: info
+      OIDC_ISSUER: http://localhost:8180/realms/portfolio
+      OIDC_AUDIENCE: gateway-api
+      JWKS_URL: http://keycloak:8080/realms/portfolio/protocol/openid-connect/certs
+      OPA_URL: http://opa:8181/v1/data/gateway/decision
+      REDIS_URL: redis://redis:6379
+      UPSTREAM_URL: http://upstream:8090
+      REQUEST_TIMEOUT_MS: 3000
+      RATE_LIMIT_REQUESTS: 20
+      RATE_LIMIT_WINDOW_SECONDS: 60
+    depends_on:
+      keycloak:
+        condition: service_started
+      opa:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      upstream:
+        condition: service_healthy
+    ports:
+      - '127.0.0.1:8080:8080'
+    networks: [edge, backend]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    init: true
+    restart: unless-stopped
+
+networks:
+  edge: {}
+  backend:
+    internal: true
+
+volumes:
+  identity-data: {}

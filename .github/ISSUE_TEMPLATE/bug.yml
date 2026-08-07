@@ -1,0 +1,29 @@
+name: Bug report
+description: Report a reproducible defect without including sensitive data
+title: 'bug: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include bearer tokens, cookies, passwords, private keys, or production identifiers.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Provide minimal sanitized steps.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node.js, Docker, and Compose versions.
+    validations:
+      required: true
