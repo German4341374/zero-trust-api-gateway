@@ -1,0 +1,42 @@
+{
+  "name": "zero-trust-api-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Policy-enforced API gateway with OIDC, OPA, Redis rate limiting, and a safe fixed-upstream proxy.",
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:coverage && npm run build",
+    "dev": "tsx watch src/main.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --max-warnings=0",
+    "start": "node dist/main.js",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "fastify": "5.11.2",
+    "jose": "6.2.8",
+    "pino": "10.3.1",
+    "redis": "6.2.0",
+    "undici": "8.10.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.12.0",
+    "@vitest/coverage-v8": "4.1.10",
+    "eslint": "10.0.2",
+    "globals": "17.4.0",
+    "prettier": "3.9.0",
+    "tsx": "4.23.11",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.66.0",
+    "vitest": "4.1.10"
+  }
+}
