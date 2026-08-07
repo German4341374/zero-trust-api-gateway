@@ -13,7 +13,7 @@ services:
       timeout: 3s
       retries: 20
     volumes:
-      - identity-data:/var/lib/postgresql/data
+      - identity-data:/var/lib/postgresql
     networks: [backend]
     restart: unless-stopped
 
