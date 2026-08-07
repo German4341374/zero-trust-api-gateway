@@ -53,6 +53,9 @@
   "users": [
     {
       "username": "viewer",
+      "firstName": "Demo",
+      "lastName": "Viewer",
+      "email": "viewer@example.test",
       "enabled": true,
       "emailVerified": true,
       "attributes": { "tenant": ["acme"] },
@@ -63,6 +66,9 @@
     },
     {
       "username": "admin",
+      "firstName": "Demo",
+      "lastName": "Administrator",
+      "email": "admin@example.test",
       "enabled": true,
       "emailVerified": true,
       "attributes": { "tenant": ["acme"] },
