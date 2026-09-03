@@ -5,7 +5,7 @@
 [![Open Policy Agent](https://img.shields.io/badge/OPA-policy--as--code-7D57FF)](https://www.openpolicyagent.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A local security lab that enforces identity, authorization, rate limits, and safe upstream routing at an API boundary. It demonstrates the controls behind a zero-trust request path without requiring cloud credentials or paid services.
+A local security lab for inspecting a zero-trust request path from token validation to upstream routing. Every request passes identity, policy and rate-limit checks, and dependency failures deny access instead of weakening the controls.
 
 ## Why this project matters
 
@@ -187,7 +187,7 @@ See [architecture and trust boundaries](docs/architecture.md) and the [authoriza
 - The audit trail is structured stdout, not tamper-evident storage.
 - TLS termination, certificate rotation, distributed tracing, and multi-region identity failover are not included.
 
-## Future improvements
+## Next security exercises
 
 - Sign and distribute versioned OPA bundles.
 - Add mTLS and workload identity between the gateway and upstream services.
@@ -196,7 +196,7 @@ See [architecture and trust boundaries](docs/architecture.md) and the [authoriza
 - Add external immutable audit storage and retention policies.
 - Exercise key rotation, Redis failover, and policy rollback in controlled chaos tests.
 
-## Interview talking points
+## Design questions
 
 - Why authentication, authorization, and rate limiting are independent controls
 - How issuer/audience/algorithm validation prevents common JWT mistakes
