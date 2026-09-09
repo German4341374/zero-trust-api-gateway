@@ -5,7 +5,12 @@
 [![Open Policy Agent](https://img.shields.io/badge/OPA-policy--as--code-7D57FF)](https://www.openpolicyagent.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A local security lab for inspecting a zero-trust request path from token validation to upstream routing. Every request passes identity, policy and rate-limit checks, and dependency failures deny access instead of weakening the controls.
+Put a gateway in front of a local API and try requests with different tokens and permissions.
+It checks identity, asks OPA whether the request is allowed, and uses Redis for rate limits
+before forwarding to a fixed upstream service.
+
+The demo includes denied requests and dependency failures. If a required check can't finish,
+the gateway denies access rather than letting the request through.
 
 ## Why this project matters
 
